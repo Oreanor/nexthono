@@ -3,13 +3,13 @@ export interface JsonPlaceholderUser {
   name: string;
   username: string;
   email: string;
-  phone: string;
-  website: string;
+  phone: string | null;
+  website: string | null;
   company: {
     name: string;
     catchPhrase: string;
     bs: string;
-  };
+  } | null;
 }
 
 export async function fetchUsersFromJsonPlaceholder(): Promise<JsonPlaceholderUser[]> {

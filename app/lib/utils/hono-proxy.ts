@@ -1,33 +1,30 @@
 import { NextRequest } from 'next/server';
 import { Hono } from 'hono';
+import { NextResponse } from 'next/server';
 
 /**
- * Создает прокси функцию для HTTP метода
- * Обрабатывает преобразование Next.js запроса в Hono запрос
+ * Создает прокси для Hono приложения
  */
-export function createHonoProxy(app: Hono) {
-  return async (
-    request: NextRequest,
-    { params }: { params: Promise<{ path: string[] }> }
-  ) => {
-    const { path: pathArray } = await params;
-    const path = pathArray.join('/');
-    
+export function createHonoProxy(honoApp: Hono) {
+  return async (request: NextRequest): Promise<NextResponse> => {
     const url = new URL(request.url);
-    url.pathname = `/${path}`;
+    const path = url.pathname.replace('/api', '');
     
-    const requestInit: any = {
+    // Выполняем запрос через Hono
+    const response = await honoApp.request(path, {
       method: request.method,
-      headers: request.headers,
-    };
+      headers: request.headers as unknown as HeadersInit,
+      body: request.body,
+    });
     
-    // Добавляем body и duplex только для методов с телом
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) && request.body) {
-      requestInit.body = request.body;
-      requestInit.duplex = 'half';
-    }
+    // Конвертируем Hono Response в NextResponse
+    const responseBody = await response.text();
+    const nextResponse = new NextResponse(responseBody, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers as unknown as HeadersInit,
+    });
     
-    const honoRequest = new Request(url.toString(), requestInit);
-    return app.fetch(honoRequest);
+    return nextResponse;
   };
 }

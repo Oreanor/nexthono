@@ -5,10 +5,12 @@ import { useUsers } from '@/app/lib/hooks/useUsers';
 import UserList from '@/app/components/UserList';
 import SearchBar from '@/app/components/SearchBar';
 import AddUserModal from '@/app/components/AddUserModal';
-import { User, BaseUser } from '@/app/lib/types/user';
+import { BaseUser, User } from '@/app/lib/types/user';
 
 export default function Home() {
   const { users, loading, error, searchUsers, addUser, seedFromJsonPlaceholder, clearAllUsers } = useUsers();
+  
+  // Простое состояние компонента
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
@@ -25,7 +27,7 @@ export default function Home() {
       setAddUserError(null);
       await addUser(userData);
       setIsAddModalOpen(false);
-      setAddUserError(null); // Очищаем ошибку при успешном добавлении
+      setAddUserError(null);
     } catch (error) {
       setAddUserError(error instanceof Error ? error.message : 'Произошла неожиданная ошибка');
     } finally {
@@ -35,7 +37,7 @@ export default function Home() {
 
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
-    setAddUserError(null); // Очищаем ошибку при закрытии модального окна
+    setAddUserError(null);
   };
 
   const handleUserClick = (user: User) => {
