@@ -41,7 +41,7 @@ export async function corsMiddleware(c: Context, next: Next) {
   c.header('Access-Control-Allow-Credentials', 'true')
   
   if (c.req.method === 'OPTIONS') {
-    return c.text('', 204)
+    return c.status(204)
   }
   
   await next()
