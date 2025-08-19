@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono'
 
 /**
- * Security middleware для добавления security headers
+ * Security middleware for adding security headers
  */
 export async function securityHeaders(c: Context, next: Next) {
   // Security Headers
@@ -17,7 +17,7 @@ export async function securityHeaders(c: Context, next: Next) {
     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
   )
   
-  // HSTS (только для HTTPS)
+  // HSTS (only for HTTPS)
   if (process.env.NODE_ENV === 'production') {
     c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
   }
@@ -48,7 +48,7 @@ export async function corsMiddleware(c: Context, next: Next) {
 }
 
 /**
- * Rate limiting middleware (простая реализация)
+ * Rate limiting middleware (simple implementation)
  */
 export function createRateLimiter(maxRequests: number = 100, windowMs: number = 15 * 60 * 1000) {
   const requests = new Map<string, { count: number; resetTime: number }>()

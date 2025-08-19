@@ -13,10 +13,10 @@ export const HTTP_STATUS = {
 // API Error Messages
 export const ERROR_MESSAGES = {
   VALIDATION: {
-    REQUIRED_FIELDS: 'Обязательные поля не заполнены',
-    INVALID_EMAIL: 'Неверный формат email',
-    INVALID_USERNAME: 'Неверный формат username',
-    INVALID_ID: 'Неверный ID',
+    REQUIRED_FIELDS: 'Required fields are not filled',
+    INVALID_EMAIL: 'Invalid email format',
+    INVALID_USERNAME: 'Invalid username format',
+    INVALID_ID: 'Invalid ID',
     QUERY_REQUIRED: 'Query parameter "q" is required',
   },
   DATABASE: {
@@ -30,7 +30,7 @@ export const ERROR_MESSAGES = {
     NOT_FOUND: 'User not found',
     EMAIL_EXISTS: 'Email already exists',
     USERNAME_EXISTS: 'Username already exists',
-    ALREADY_SEEDED: 'База данных уже содержит пользователей',
+    ALREADY_SEEDED: 'Database already contains users',
   },
   GENERAL: {
     INTERNAL_ERROR: 'Internal server error',

@@ -26,35 +26,35 @@ export const VALIDATION_CONSTANTS = {
   },
 } as const;
 
-// Схема валидации для создания пользователя
+// Schema for creating a user
 export const createUserSchema = z.object({
   name: z
     .string()
-    .min(VALIDATION_CONSTANTS.NAME.MIN_LENGTH, `Имя должно содержать минимум ${VALIDATION_CONSTANTS.NAME.MIN_LENGTH} символа`)
-    .max(VALIDATION_CONSTANTS.NAME.MAX_LENGTH, `Имя не должно превышать ${VALIDATION_CONSTANTS.NAME.MAX_LENGTH} символов`)
+    .min(VALIDATION_CONSTANTS.NAME.MIN_LENGTH, `Name must contain at least ${VALIDATION_CONSTANTS.NAME.MIN_LENGTH} characters`)
+    .max(VALIDATION_CONSTANTS.NAME.MAX_LENGTH, `Name must not exceed ${VALIDATION_CONSTANTS.NAME.MAX_LENGTH} characters`)
     .trim()
-    .refine((val) => val.length > 0, 'Имя обязательно для заполнения'),
+    .refine((val) => val.length > 0, 'Name is required'),
   
   email: z
     .string()
     .refine((val) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(val);
-    }, { message: 'Неверный формат email адреса' })
-    .max(VALIDATION_CONSTANTS.EMAIL.MAX_LENGTH, `Email не должен превышать ${VALIDATION_CONSTANTS.EMAIL.MAX_LENGTH} символов`)
+    }, { message: 'Invalid email format' })
+    .max(VALIDATION_CONSTANTS.EMAIL.MAX_LENGTH, `Email must not exceed ${VALIDATION_CONSTANTS.EMAIL.MAX_LENGTH} characters`)
     .toLowerCase()
     .trim(),
   
   username: z
     .string()
-    .min(VALIDATION_CONSTANTS.USERNAME.MIN_LENGTH, `Username должен содержать минимум ${VALIDATION_CONSTANTS.USERNAME.MIN_LENGTH} символа`)
-    .max(VALIDATION_CONSTANTS.USERNAME.MAX_LENGTH, `Username не должен превышать ${VALIDATION_CONSTANTS.USERNAME.MAX_LENGTH} символов`)
-    .regex(VALIDATION_CONSTANTS.USERNAME.PATTERN, 'Username может содержать только буквы, цифры, дефисы и подчеркивания')
+    .min(VALIDATION_CONSTANTS.USERNAME.MIN_LENGTH, `Username must contain at least ${VALIDATION_CONSTANTS.USERNAME.MIN_LENGTH} characters`)
+    .max(VALIDATION_CONSTANTS.USERNAME.MAX_LENGTH, `Username must not exceed ${VALIDATION_CONSTANTS.USERNAME.MAX_LENGTH} characters`)
+    .regex(VALIDATION_CONSTANTS.USERNAME.PATTERN, 'Username can only contain letters, numbers, hyphens and underscores')
     .trim(),
   
   phone: z
     .string()
-    .max(VALIDATION_CONSTANTS.PHONE.MAX_LENGTH, `Телефон не должен превышать ${VALIDATION_CONSTANTS.PHONE.MAX_LENGTH} символов`)
+    .max(VALIDATION_CONSTANTS.PHONE.MAX_LENGTH, `Phone must not exceed ${VALIDATION_CONSTANTS.PHONE.MAX_LENGTH} characters`)
     .optional()
     .nullable(),
   
@@ -68,32 +68,32 @@ export const createUserSchema = z.object({
       } catch {
         return false;
       }
-    }, { message: 'Неверный формат URL' })
-    .max(VALIDATION_CONSTANTS.WEBSITE.MAX_LENGTH, `Website не должен превышать ${VALIDATION_CONSTANTS.WEBSITE.MAX_LENGTH} символов`)
+    }, { message: 'Invalid URL format' })
+    .max(VALIDATION_CONSTANTS.WEBSITE.MAX_LENGTH, `Website must not exceed ${VALIDATION_CONSTANTS.WEBSITE.MAX_LENGTH} characters`)
     .optional()
     .nullable(),
   
   company: z
     .string()
-    .max(VALIDATION_CONSTANTS.COMPANY.MAX_LENGTH, `Название компании не должно превышать ${VALIDATION_CONSTANTS.COMPANY.MAX_LENGTH} символов`)
+    .max(VALIDATION_CONSTANTS.COMPANY.MAX_LENGTH, `Company name must not exceed ${VALIDATION_CONSTANTS.COMPANY.MAX_LENGTH} characters`)
     .optional()
     .nullable(),
 });
 
-// Схема валидации для поиска
+// Schema for search
 export const searchQuerySchema = z.object({
   q: z
     .string()
-    .min(1, 'Поисковый запрос не может быть пустым')
-    .max(100, 'Поисковый запрос не должен превышать 100 символов')
+    .min(1, 'Search query cannot be empty')
+    .max(100, 'Search query must not exceed 100 characters')
     .trim(),
 });
 
-// Схема валидации для ID
+// Schema for ID
 export const idParamSchema = z.object({
   id: z
     .string()
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'ID должен быть положительным числом')
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, 'ID must be a positive number')
     .transform((val) => parseInt(val, 10)),
 });
 
@@ -102,42 +102,42 @@ export type SearchQueryInput = z.infer<typeof searchQuerySchema>;
 export type IdParamInput = z.infer<typeof idParamSchema>;
 
 /**
- * Валидирует данные для создания пользователя
+ * Validates data for creating a user
  */
 export function validateCreateUser(data: unknown): CreateUserInput {
   try {
     return createUserSchema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new ValidationError('Ошибка валидации данных');
+      throw new ValidationError('Data validation error');
     }
     throw error;
   }
 }
 
 /**
- * Валидирует поисковый запрос
+ * Validates search query
  */
 export function validateSearchQuery(query: unknown): SearchQueryInput {
   try {
     return searchQuerySchema.parse(query);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new ValidationError('Неверный поисковый запрос');
+      throw new ValidationError('Invalid search query');
     }
     throw error;
   }
 }
 
 /**
- * Валидирует ID параметр
+ * Validates ID parameter
  */
 export function validateIdParam(params: unknown): IdParamInput {
   try {
     return idParamSchema.parse(params);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new ValidationError('Неверный ID');
+      throw new ValidationError('Invalid ID');
     }
     throw error;
   }

@@ -10,7 +10,7 @@ import { pluralizeUser } from '@/app/lib/utils/pluralize';
 
 export class UserService {
   /**
-   * Получает всех пользователей
+   * Gets all users
    */
   async getAllUsers(): Promise<User[]> {
     try {
@@ -28,7 +28,7 @@ export class UserService {
   }
 
   /**
-   * Получает пользователя по ID
+   * Gets user by ID
    */
   async getUserById(id: number): Promise<User> {
     try {
@@ -54,7 +54,7 @@ export class UserService {
   }
 
   /**
-   * Ищет пользователей по имени
+   * Searches users by name
    */
   async searchUsers(query: string): Promise<User[]> {
     try {
@@ -72,16 +72,16 @@ export class UserService {
   }
 
   /**
-   * Создает нового пользователя
+   * Creates a new user
    */
   async createUser(userData: BaseUser): Promise<User> {
     try {
       logger.info('Creating new user', { email: userData.email, username: userData.username })
       
-      // Валидируем данные
+      // Validate data
       const validatedData = validateCreateUser(userData)
       
-      // Проверяем существование пользователя
+      // Check if user exists
       const existingEmail = await db.select().from(users).where(eq(users.email, validatedData.email))
       if (existingEmail.length > 0) {
         logger.warn('User creation failed - email already exists', { email: validatedData.email })
@@ -94,7 +94,7 @@ export class UserService {
         throw new ConflictError('User with this username already exists')
       }
       
-      // Создаем пользователя
+      // Create user
       const result = await db.insert(users).values({
         name: validatedData.name.trim(),
         email: validatedData.email.trim().toLowerCase(),
@@ -118,26 +118,26 @@ export class UserService {
   }
 
   /**
-   * Заполняет базу данных тестовыми данными
+   * Seeds database with test data
    */
   async seedFromJsonPlaceholder(): Promise<{ message: string; count: number }> {
     try {
       logger.info('Starting database seeding from JSONPlaceholder')
       
-      // Проверяем, есть ли уже пользователи
+      // Check if users already exist
       const existingCount = await this.getUserCount()
       if (existingCount > 0) {
         logger.warn('Database seeding skipped - users already exist', { existingCount })
         throw new ConflictError('Database already contains users')
       }
       
-      // Получаем данные с JSONPlaceholder
+      // Get data from JSONPlaceholder
       const jsonUsers = await fetchUsersFromJsonPlaceholder()
       const count = jsonUsers.length
       const userWord = pluralizeUser(count)
       logger.info(`Fetched ${count} ${userWord} from JSONPlaceholder`)
       
-      // Преобразуем данные в формат нашей базы данных
+      // Transform data to our database format
       const usersToInsert: BaseUser[] = jsonUsers.map(user => ({
         name: user.name,
         email: user.email,
@@ -147,7 +147,7 @@ export class UserService {
         company: user.company?.name as string | undefined,
       }))
       
-      // Создаем пользователей
+      // Create users
       const result = await db.insert(users).values(usersToInsert).returning() as User[]
       const createdCount = result.length
       const createdWord = pluralizeUser(createdCount)
@@ -168,7 +168,7 @@ export class UserService {
   }
 
   /**
-   * Очищает всех пользователей
+   * Clears all users
    */
   async clearAllUsers(): Promise<{ message: string; count: number }> {
     try {
@@ -190,7 +190,7 @@ export class UserService {
   }
 
   /**
-   * Получает количество пользователей
+   * Gets user count
    */
   async getUserCount(): Promise<number> {
     try {
