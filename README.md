@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NextHono - Приложение управления пользователями
 
-## Getting Started
+Приложение для управления пользователями, построенное с использованием:
+- **Next.js 15** - React фреймворк
+- **Hono** - Быстрый веб-фреймворк для API
+- **Drizzle ORM** - TypeScript ORM для работы с базой данных
+- **SQLite** - Локальная база данных
+- **Tailwind CSS** - CSS фреймворк для стилизации
 
-First, run the development server:
+## Функциональность
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 📋 **Список пользователей** - Отображение всех пользователей в базе данных
+- 🔍 **Поиск и фильтрация** - Поиск пользователей по имени
+- ➕ **Добавление пользователей** - Модальное окно для создания новых пользователей
+- 📥 **Загрузка данных** - Импорт пользователей с JSONPlaceholder API
+- 💾 **Локальная база данных** - SQLite с автоматическими миграциями
+
+## Установка и запуск
+
+1. **Клонируйте репозиторий:**
+   ```bash
+   git clone <repository-url>
+   cd nexthono
+   ```
+
+2. **Установите зависимости:**
+   ```bash
+   npm install
+   ```
+
+3. **Сгенерируйте миграции базы данных:**
+   ```bash
+   npm run db:generate
+   ```
+
+4. **Запустите приложение в режиме разработки:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Откройте браузер и перейдите по адресу:**
+   ```
+   http://localhost:3000
+   ```
+
+## Структура проекта
+
+```
+nexthono/
+├── app/                    # Next.js App Router
+│   ├── api/               # API роуты Next.js
+│   │   ├── users/         # API для пользователей
+│   │   │   ├── route.ts   # GET/POST пользователей
+│   │   │   ├── search/    # Поиск пользователей
+│   │   │   ├── seed/      # Загрузка с JSONPlaceholder
+│   │   │   └── [id]/      # Получение по ID
+│   │   └── ...
+│   ├── components/        # React компоненты
+│   │   ├── UserList.tsx   # Список пользователей
+│   │   ├── SearchBar.tsx  # Поисковая строка
+│   │   └── AddUserModal.tsx # Модальное окно добавления
+│   ├── lib/               # Библиотеки и утилиты
+│   │   ├── db/            # База данных
+│   │   │   ├── index.ts   # Подключение к БД
+│   │   │   ├── schema.ts  # Схема таблиц
+│   │   │   ├── init.ts    # Инициализация БД
+│   │   │   └── migrations/ # Миграции
+│   │   ├── hooks/         # React хуки
+│   │   │   └── useUsers.ts # Хук для работы с пользователями
+│   │   ├── services/      # Сервисы
+│   │   │   └── jsonplaceholder.ts # Работа с JSONPlaceholder API
+│   │   └── types/         # TypeScript типы
+│   │       └── user.ts    # Типы пользователей
+│   ├── page.tsx           # Главная страница
+│   └── layout.tsx         # Корневой layout
+├── drizzle.config.ts      # Конфигурация Drizzle
+└── package.json           # Зависимости и скрипты
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Пользователи
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `GET /api/users` - Получить всех пользователей
+- `GET /api/users/search?q=query` - Поиск пользователей
+- `POST /api/users` - Добавить нового пользователя
+- `GET /api/users/:id` - Получить пользователя по ID
+- `POST /api/users/seed` - Загрузить данные с JSONPlaceholder
 
-## Learn More
+### Примеры запросов
 
-To learn more about Next.js, take a look at the following resources:
+**Получить всех пользователей:**
+```bash
+curl http://localhost:3000/api/users
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Поиск пользователей:**
+```bash
+curl "http://localhost:3000/api/users/search?q=John"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Добавить пользователя:**
+```bash
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "username": "johndoe",
+    "phone": "+1234567890",
+    "website": "https://johndoe.com",
+    "company": "Example Corp"
+  }'
+```
 
-## Deploy on Vercel
+**Загрузить данные с JSONPlaceholder:**
+```bash
+curl -X POST http://localhost:3000/api/users/seed
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Скрипты
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` - Запуск в режиме разработки
+- `npm run build` - Сборка для продакшена
+- `npm run start` - Запуск продакшен версии
+- `npm run lint` - Проверка кода
+- `npm run db:generate` - Генерация миграций
+- `npm run db:migrate` - Применение миграций
+- `npm run db:studio` - Запуск Drizzle Studio
+
+## Технологии
+
+- **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend:** Hono, Drizzle ORM
+- **Database:** SQLite
+- **Development:** ESLint, Turbopack
+
+## Особенности
+
+- 🚀 **Быстрая разработка** с Turbopack
+- 🔒 **Type-safe** с TypeScript и Drizzle
+- 📱 **Responsive дизайн** с Tailwind CSS
+- 🎯 **Простая архитектура** с разделением на компоненты
+- 🔄 **Автоматические миграции** базы данных
+- 🌐 **Интеграция с внешними API** (JSONPlaceholder)
+
+## Лицензия
+
+MIT

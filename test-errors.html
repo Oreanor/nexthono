@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест обработки ошибок API</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-case { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; margin: 5px; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .result { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест обработки ошибок API</h1>
+    <p>Этот файл тестирует улучшенную обработку ошибок в API пользователей.</p>
+    
+    <div class="test-case">
+        <h3>1. Тест неверного email</h3>
+        <button onclick="testInvalidEmail()">Тестировать неверный email</button>
+        <div id="test1-result" class="result"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>2. Тест пустых обязательных полей</h3>
+        <button onclick="testEmptyFields()">Тестировать пустые поля</button>
+        <div id="test2-result" class="result"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>3. Тест дублирования email</h3>
+        <button onclick="testDuplicateEmail()">Тестировать дублирование email</button>
+        <div id="test3-result" class="result"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>4. Тест дублирования username</h3>
+        <button onclick="testDuplicateUsername()">Тестировать дублирование username</button>
+        <div id="test4-result" class="result"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>5. Тест успешного добавления</h3>
+        <button onclick="testValidUser()">Тестировать валидного пользователя</button>
+        <div id="test5-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`;
+
+        async function makeRequest(data) {
+            try {
+                const response = await fetch(`${API_BASE}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                return { status: response.status, data: result };
+            } catch (error) {
+                return { status: 0, data: { error: error.message } };
+            }
+        }
+
+        function displayResult(elementId, result, expectedStatus) {
+            const element = document.getElementById(elementId);
+            const isExpected = result.status === expectedStatus;
+            
+            element.className = `result ${isExpected ? 'success' : 'error'}`;
+            element.innerHTML = `
+                <strong>Статус:</strong> ${result.status} ${isExpected ? '✅' : '❌'}<br>
+                <strong>Ответ:</strong>
+                <pre>${JSON.stringify(result.data, null, 2)}</pre>
+            `;
+        }
+
+        async function testInvalidEmail() {
+            const result = await makeRequest({
+                name: "Тест Пользователь",
+                email: "неверный-email",
+                username: "testuser"
+            });
+            displayResult('test1-result', result, 400);
+        }
+
+        async function testEmptyFields() {
+            const result = await makeRequest({
+                name: "",
+                email: "",
+                username: ""
+            });
+            displayResult('test2-result', result, 400);
+        }
+
+        async function testDuplicateEmail() {
+            // Сначала создаем пользователя
+            await makeRequest({
+                name: "Первый пользователь",
+                email: "duplicate@test.com",
+                username: "firstuser"
+            });
+
+            // Затем пытаемся создать с тем же email
+            const result = await makeRequest({
+                name: "Второй пользователь",
+                email: "duplicate@test.com",
+                username: "seconduser"
+            });
+            displayResult('test3-result', result, 409);
+        }
+
+        async function testDuplicateUsername() {
+            // Сначала создаем пользователя
+            await makeRequest({
+                name: "Первый пользователь",
+                email: "first@test.com",
+                username: "duplicateuser"
+            });
+
+            // Затем пытаемся создать с тем же username
+            const result = await makeRequest({
+                name: "Второй пользователь", 
+                email: "second@test.com",
+                username: "duplicateuser"
+            });
+            displayResult('test4-result', result, 409);
+        }
+
+        async function testValidUser() {
+            const timestamp = Date.now();
+            const result = await makeRequest({
+                name: "Валидный Пользователь",
+                email: `valid${timestamp}@test.com`,
+                username: `validuser${timestamp}`,
+                phone: "+1234567890",
+                website: "https://example.com",
+                company: "Test Company"
+            });
+            displayResult('test5-result', result, 201);
+        }
+    </script>
+</body>
+</html>
